@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17131f">
+  <meta name="description" content="A beautiful memories gallery made from the Photos folder.">
+  <title>Meenu Memories Gallery</title>
+  <script>
+    const pageParams = new URLSearchParams(location.search);
+    if (pageParams.get("from") !== "birthday") {
+      const preview = pageParams.get("test") === "1" ? "?test=1" : "";
+      location.replace(`birthday.html${preview}`);
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #17131f;
+      --panel: rgba(255, 255, 255, .08);
+      --line: rgba(255, 255, 255, .16);
+      --text: #fff8f3;
+      --soft: #d9cedf;
+      --muted: #a99fb1;
+      --rose: #ff9ab8;
+      --coral: #ffcfb5;
+      --mint: #8ce6d0;
+      --gold: #f5d489;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+      --radius: 8px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 12% 15%, rgba(255, 154, 184, .25), transparent 30%),
+        radial-gradient(circle at 88% 24%, rgba(140, 230, 208, .18), transparent 28%),
+        radial-gradient(circle at 50% 92%, rgba(245, 212, 137, .14), transparent 35%),
+        linear-gradient(140deg, #121019 0%, #24172b 48%, #151b24 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), transparent 76%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { border: 0; color: inherit; font: inherit; cursor: pointer; }
+    img, video { display: block; max-width: 100%; }
+
+    .page-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0;
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #211523;
+      background: linear-gradient(135deg, var(--coral), var(--rose) 55%, var(--mint));
+      box-shadow: 0 12px 32px rgba(255, 154, 184, .2);
+      flex: 0 0 auto;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(16, 13, 24, .55);
+    }
+
+    .nav a,
+    .icon-button,
+    .filter-button {
+      min-height: 40px;
+      border-radius: 999px;
+      background: transparent;
+      transition: transform .2s ease, background .2s ease, color .2s ease;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      color: var(--soft);
+      font-size: .9rem;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      color: var(--text);
+      background: rgba(255, 255, 255, .1);
+      outline: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr);
+      gap: 34px;
+      align-items: center;
+      min-height: calc(100svh - 76px);
+      padding: 26px 0 44px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { margin: 0; letter-spacing: 0; }
+
+    h1 {
+      max-width: 780px;
+      font-family: var(--serif);
+      font-size: clamp(3rem, 8vw, 7.8rem);
+      font-weight: 500;
+      line-height: .92;
+    }
+
+    h1 span,
+    h2 span {
+      color: transparent;
+      background: linear-gradient(100deg, #fff7ee, var(--coral) 36%, var(--rose) 70%, var(--mint));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .lead {
+      max-width: 620px;
+      margin: 24px 0 0;
+      color: var(--soft);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--coral), var(--rose));
+      color: #24121f;
+      box-shadow: 0 18px 44px rgba(255, 154, 184, .23);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 52px rgba(255, 154, 184, .34);
+      outline: none;
+    }
+
+    .button.secondary {
+      color: var(--text);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .08);
+      box-shadow: none;
+    }
+
+    .hero-stage {
+      position: relative;
+      min-height: 620px;
+    }
+
+    .frame {
+      position: absolute;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .06);
+      box-shadow: var(--shadow);
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+    }
+
+    .frame-main { inset: 30px 0 88px 72px; }
+
+    .frame-side {
+      right: 34px;
+      bottom: 0;
+      width: 42%;
+      aspect-ratio: 4 / 5;
+      border-width: 8px;
+      border-color: rgba(255, 248, 243, .82);
+      transform: rotate(3deg);
+    }
+
+    .frame-small {
+      left: 0;
+      top: 0;
+      width: 37%;
+      aspect-ratio: 1;
+      transform: rotate(-5deg);
+      border-width: 8px;
+      border-color: rgba(255, 248, 243, .78);
+    }
+
+    .hero-card {
+      position: absolute;
+      left: 24px;
+      bottom: 34px;
+      width: min(380px, 84%);
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(18, 14, 27, .72);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 58px rgba(0, 0, 0, .26);
+    }
+
+    .hero-card strong { display: block; margin-bottom: 6px; font-size: 1.05rem; }
+    .hero-card p { margin: 0; color: var(--soft); line-height: 1.6; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .stat b { display: block; font-size: 1.45rem; }
+    .stat span { display: block; margin-top: 3px; color: var(--muted); font-size: .83rem; }
+
+    .section { padding: 70px 0; }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 6vw, 4.8rem);
+      font-weight: 500;
+      line-height: .98;
+    }
+
+    .section-copy {
+      max-width: 520px;
+      margin: 12px 0 0;
+      color: var(--soft);
+      line-height: 1.75;
+    }
+
+    .featured {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 16px;
+      min-height: 560px;
+    }
+
+    .feature-large,
+    .feature-stack figure {
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .feature-large img,
+    .feature-stack img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .7s ease;
+    }
+
+    .feature-large:hover img,
+    .feature-stack figure:hover img,
+    .gallery-card:hover img,
+    .gallery-card:hover video { transform: scale(1.045); }
+
+    .feature-large::after,
+    .feature-stack figure::after,
+    .gallery-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(12, 10, 18, .72), transparent 45%);
+      opacity: .9;
+    }
+
+    .feature-large figcaption,
+    .feature-stack figcaption {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1;
+    }
+
+    .feature-large b,
+    .feature-stack b { display: block; font-size: 1.06rem; }
+    .feature-large span,
+    .feature-stack span { display: block; margin-top: 4px; color: var(--soft); font-size: .9rem; }
+
+    .feature-stack { display: grid; gap: 16px; }
+    .feature-stack figure:first-child { min-height: 310px; }
+    .feature-stack figure:last-child { min-height: 234px; }
+
+    .birthday-embed {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+      gap: 28px;
+      align-items: center;
+      overflow: hidden;
+      padding: clamp(22px, 5vw, 48px);
+      border: 1px solid rgba(255, 220, 230, .22);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 82% 10%, rgba(255, 183, 208, .18), transparent 38%),
+        linear-gradient(135deg, rgba(79, 37, 70, .82), rgba(30, 22, 42, .86));
+      box-shadow: var(--shadow);
+    }
+
+    .birthday-embed::before {
+      content: "✦";
+      position: absolute;
+      top: 16px;
+      right: 25px;
+      color: var(--gold);
+      font-size: 2rem;
+      animation: birthdayTwinkle 2.2s ease-in-out infinite alternate;
+    }
+
+    .birthday-embed h2 { margin: 0; }
+    .birthday-embed .section-copy { max-width: 560px; }
+    .birthday-embed .button { margin-top: 22px; }
+    .birthday-embed .button.secondary { margin-left: 8px; }
+    .birthday-portraits {
+      position: relative;
+      min-height: 350px;
+      isolation: isolate;
+    }
+    .birthday-portraits img {
+      position: absolute;
+      width: 63%;
+      height: 78%;
+      object-fit: cover;
+      border: 7px solid rgba(255, 249, 244, .9);
+      border-radius: 12px;
+      box-shadow: 0 22px 50px rgba(0,0,0,.35);
+      animation: portraitFloat 5s ease-in-out infinite;
+    }
+    .birthday-portraits img:first-child { top: 0; left: 4%; transform: rotate(-7deg); }
+    .birthday-portraits img:last-child { right: 2%; bottom: 0; transform: rotate(6deg); animation-delay: -2.2s; }
+    .birthday-caption {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      top: 46%;
+      width: max-content;
+      max-width: 100%;
+      padding: 13px 18px;
+      border: 1px solid rgba(255,255,255,.19);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(28, 16, 34, .72);
+      box-shadow: 0 12px 35px rgba(0,0,0,.24);
+      font: italic 1rem var(--serif);
+      transform: translate(-50%,-50%);
+      backdrop-filter: blur(12px);
+    }
+    @keyframes birthdayTwinkle { to { opacity: .45; transform: rotate(24deg) scale(.82); } }
+    @keyframes portraitFloat { 50% { translate: 0 -7px; } }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 26px 0 20px;
+    }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .filter-button {
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      color: var(--soft);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .filter-button.active,
+    .filter-button:hover,
+    .filter-button:focus-visible {
+      color: #1d1724;
+      background: linear-gradient(135deg, var(--gold), var(--mint));
+      outline: none;
+    }
+
+    .toolbar-note {
+      color: var(--muted);
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .gallery-return {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      margin: 38px auto 0;
+      padding: 24px 18px;
+      border: 1px solid rgba(255, 220, 230, .22);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+      text-align: center;
+    }
+    .gallery-return p { margin: 0; color: var(--soft); line-height: 1.6; }
+    .gallery-return .button { min-height: 52px; }
+
+    .gallery-card {
+      position: relative;
+      grid-column: span 4;
+      min-height: 320px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .06);
+      box-shadow: 0 16px 54px rgba(0, 0, 0, .2);
+      isolation: isolate;
+    }
+
+    .gallery-card.tall {
+      grid-row: span 2;
+      min-height: 520px;
+    }
+
+    .gallery-card.wide { grid-column: span 8; }
+
+    .gallery-card img,
+    .gallery-card video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      transition: transform .7s ease;
+    }
+
+    .card-info {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .card-info b {
+      display: block;
+      font-size: 1rem;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, .5);
+    }
+
+    .card-info span {
+      display: block;
+      margin-top: 4px;
+      color: var(--soft);
+      font-size: .82rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(0, 0, 0, .28);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(12px);
+      white-space: nowrap;
+    }
+
+    .quote-band {
+      display: grid;
+      grid-template-columns: .75fr 1.25fr;
+      gap: 28px;
+      align-items: center;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .11), rgba(255, 255, 255, .055));
+      box-shadow: var(--shadow);
+    }
+
+    .quote-photo {
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    .quote-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    blockquote {
+      margin: 0;
+      color: #fff4ef;
+      font-family: var(--serif);
+      font-size: clamp(1.65rem, 4vw, 3.6rem);
+      line-height: 1.08;
+    }
+
+    .quote-band p {
+      margin: 18px 0 0;
+      color: var(--soft);
+      line-height: 1.8;
+    }
+
+    .footer {
+      padding: 24px 0 42px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .9rem;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      grid-template-columns: 72px minmax(0, 1fr) 72px;
+      grid-template-rows: 72px minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(10, 8, 15, .92);
+      backdrop-filter: blur(20px);
+    }
+
+    .lightbox.open { display: grid; }
+
+    .lightbox-stage {
+      grid-column: 2;
+      grid-row: 2;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+    }
+
+    .lightbox-stage img,
+    .lightbox-stage video {
+      width: auto;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .lightbox-caption {
+      grid-column: 2;
+      grid-row: 3;
+      min-height: 54px;
+      color: var(--soft);
+      text-align: center;
+    }
+
+    .lightbox-caption b {
+      display: block;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .icon-button {
+      width: 48px;
+      min-width: 48px;
+      height: 48px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, .08);
+      font-size: 1.4rem;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .16);
+      outline: none;
+    }
+
+    .lightbox-close { grid-column: 3; grid-row: 1; justify-self: end; }
+    .lightbox-prev { grid-column: 1; grid-row: 2; align-self: center; justify-self: center; }
+    .lightbox-next { grid-column: 3; grid-row: 2; align-self: center; justify-self: center; }
+    .hidden { display: none !important; }
+
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-copy,
+    .hero-stage,
+    .section { animation: floatIn .75s ease both; }
+
+    @media (max-width: 900px) {
+      .nav { display: none; }
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 18px;
+      }
+      .hero-stage { min-height: 560px; }
+      .frame-main { left: 28px; }
+      .featured,
+      .quote-band,
+      .birthday-embed { grid-template-columns: 1fr; }
+      .birthday-portraits { min-height: 390px; }
+      .gallery-card,
+      .gallery-card.wide { grid-column: span 6; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100% - 22px, 1180px); }
+      .topbar { padding-top: 12px; }
+      .brand { font-size: .85rem; }
+      .hero-stage { min-height: 470px; }
+      .frame-main { inset: 42px 0 74px 0; }
+      .frame-small { width: 44%; }
+      .frame-side { width: 48%; right: 8px; }
+      .hero-card {
+        left: 10px;
+        bottom: 16px;
+        width: calc(100% - 20px);
+      }
+      .stats { grid-template-columns: 1fr; }
+      .section { padding: 48px 0; }
+      .birthday-embed { gap: 20px; padding: 24px 18px; }
+      .birthday-embed .button { width: 100%; margin: 18px 0 0; }
+      .birthday-embed .button.secondary { margin: 10px 0 0; }
+      .birthday-portraits { min-height: min(390px, 94vw); }
+      .section-head,
+      .toolbar {
+        align-items: start;
+        flex-direction: column;
+      }
+      .toolbar-note { white-space: normal; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-card,
+      .gallery-card.wide,
+      .gallery-card.tall {
+        grid-column: auto;
+        min-height: 390px;
+      }
+      .lightbox {
+        grid-template-columns: 52px minmax(0, 1fr) 52px;
+        grid-template-rows: 62px minmax(0, 1fr) auto;
+        padding: 10px;
+      }
+      .icon-button {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar page-shell">
+    <a class="brand" href="#top" aria-label="Go to top">
+      <span class="brand-mark">M</span>
+      <span>Meenu Memories</span>
+    </a>
+    <nav class="nav" aria-label="Page navigation">
+      <a href="#birthday">Birthday</a>
+      <a href="#featured">Featured</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#note">Note</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero page-shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Photos folder se bani special gallery</p>
+        <h1 id="hero-title">Har memory ko <span>beautiful</span> bana diya.</h1>
+        <p class="lead">Ye page ab clean, modern aur mobile friendly hai. Photos folder ki har photo aur video yahan show hogi, lightbox ke saath, taaki memories properly shine karein.</p>
+        <div class="hero-actions">
+          <a class="button" href="birthday.html">Happy birthday page</a>
+          <a class="button" href="#gallery">Saari photos dekho</a>
+          <a class="button secondary" href="#featured">Featured moments</a>
+        </div>
+        <div class="stats" aria-label="Gallery stats">
+          <div class="stat"><b id="photoCount">0</b><span>Photos</span></div>
+          <div class="stat"><b id="videoCount">0</b><span>Videos</span></div>
+          <div class="stat"><b id="totalCount">0</b><span>Total files</span></div>
+        </div>
+      </div>
+
+      <div class="hero-stage" aria-hidden="true">
+        <div class="frame frame-main"><img src="Photos/IMG_2257.PNG" alt=""></div>
+        <div class="frame frame-small"><img src="Photos/WhatsApp Image 2026-09-30 at 8.42.10 PM.jpeg" alt=""></div>
+        <div class="frame frame-side"><img src="Photos/IMG_7737.PNG" alt=""></div>
+        <div class="hero-card">
+          <strong>Meri favourite yaadein</strong>
+          <p>Soft colors, smooth layout, aur saari memories ek jagah. Open karo, swipe karo, aur full screen me dekho.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="featured" aria-labelledby="featured-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Featured</p>
+          <h2 id="featured-title">Sabse pyaare <span>moments</span></h2>
+          <p class="section-copy">Top memories ko magazine-style layout me rakha hai. Neeche complete gallery me har file available hai.</p>
+        </div>
+      </div>
+      <div class="featured">
+        <figure class="feature-large">
+          <img src="Photos/IMG_2250.PNG" alt="Featured memory">
+          <figcaption><b>Ek perfect frame</b><span>Beautiful moment, beautiful memory.</span></figcaption>
+        </figure>
+        <div class="feature-stack">
+          <figure>
+            <img src="Photos/IMG_2315.PNG" alt="Featured memory">
+            <figcaption><b>Soft smile, strong memory</b><span>Iss moment ki vibe alag hi hai.</span></figcaption>
+          </figure>
+          <figure>
+            <img src="Photos/IMG_1873.PNG" alt="Featured memory">
+            <figcaption><b>Little details</b><span>Chhoti chhoti baatein hi special banati hain.</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="birthday" aria-labelledby="birthday-title">
+      <div class="birthday-embed">
+        <div>
+          <p class="eyebrow">A birthday surprise, right here</p>
+          <h2 id="birthday-title">Happy Birthday <span>Meenu</span> 🎂</h2>
+          <p class="section-copy">Meri duniya ki sabse pyaari insaan ko — tumhari smile, tumhari khushi aur humari saari pyaari memories ke naam. May your birthday be filled with all the love you deserve. ❤️</p>
+          <a class="button" href="birthday.html">Birthday wishes kholo ✨</a>
+          <a class="button secondary" href="#gallery">Hamari memories dekho ↓</a>
+        </div>
+        <div class="birthday-portraits" aria-label="Birthday memories of Meenu">
+          <img src="Photos/IMG_2257.PNG" alt="Meenu and her partner sharing an outdoor memory" loading="lazy">
+          <img src="Photos/IMG_2250.PNG" alt="A happy moment together" loading="lazy">
+          <div class="birthday-caption">For Meenu, with all my love 💗</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="gallery" aria-labelledby="gallery-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Complete gallery</p>
+          <h2 id="gallery-title">Photos folder ka <span>sab kuch</span></h2>
+          <p class="section-copy">Neeche current Photos folder ki saari images aur videos show ho rahi hain. Kisi bhi card par click karke full screen view open kar sakte ho.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="filters" role="tablist" aria-label="Gallery filter">
+          <button class="filter-button active" type="button" data-filter="all">All</button>
+          <button class="filter-button" type="button" data-filter="photo">Photos</button>
+          <button class="filter-button" type="button" data-filter="video">Videos</button>
+        </div>
+        <div class="toolbar-note" id="visibleCount">Showing all files</div>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <div class="gallery-return hidden" id="galleryReturn">
+        <p>Saari memories dekh li? Ab birthday surprise par wapas chalte hain 💗</p>
+        <button class="button" id="returnToBirthday" type="button">Birthday surprise par wapas ↩</button>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="note" aria-labelledby="note-title">
+      <div class="quote-band">
+        <div class="quote-photo">
+          <img src="Photos/IMG_2761.PNG" alt="Memory portrait">
+        </div>
+        <div>
+          <p class="eyebrow">A little note</p>
+          <blockquote id="note-title">Jo moments dil ke kareeb hote hain, unhe page par bhi utna hi khoobsurat dikhna chahiye.</blockquote>
+          <p>Isliye design ko simple, premium aur photo-focused rakha hai. Background calm hai, cards polished hain, aur gallery mobile par bhi proper fit hoti hai.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer page-shell">
+    Made with care for Meenu. All media is loaded from the local Photos folder.
+  </footer>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Media preview">
+    <button class="icon-button lightbox-close" id="closeLightbox" type="button" aria-label="Close preview">x</button>
+    <button class="icon-button lightbox-prev" id="prevMedia" type="button" aria-label="Previous media">&lt;</button>
+    <div class="lightbox-stage" id="lightboxStage"></div>
+    <button class="icon-button lightbox-next" id="nextMedia" type="button" aria-label="Next media">&gt;</button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+
+  <script>
+    const media = [
+      { type: "photo", src: "Photos/WhatsApp Image 2026-09-30 at 8.42.10 PM.jpeg", title: "WhatsApp memory", note: "Photo from the folder", shape: "wide" },
+      { type: "photo", src: "Photos/IMG_7737.PNG", title: "IMG 7737", note: "A favourite frame", shape: "tall" },
+      { type: "photo", src: "Photos/IMG_2761.PNG", title: "IMG 2761", note: "Soft portrait moment" },
+      { type: "video", src: "Photos/IMG_2759.MP4", title: "IMG 2759", note: "Video memory", shape: "wide" },
+      { type: "photo", src: "Photos/IMG_2315.PNG", title: "IMG 2315", note: "Bright memory" },
+      { type: "photo", src: "Photos/IMG_2257.PNG", title: "IMG 2257", note: "Beautiful shot", shape: "tall" },
+      { type: "photo", src: "Photos/IMG_2250.PNG", title: "IMG 2250", note: "Gallery highlight" },
+      { type: "photo", src: "Photos/IMG_1873.PNG", title: "IMG 1873", note: "Close to heart" },
+      { type: "photo", src: "Photos/IMG_1641.PNG", title: "IMG 1641", note: "Lovely memory" },
+      { type: "video", src: "Photos/IMG_1494.MOV", title: "IMG 1494", note: "Video memory", shape: "wide" },
+      { type: "photo", src: "Photos/IMG_1480.PNG", title: "IMG 1480", note: "Picture perfect" },
+      { type: "video", src: "Photos/IMG_1477.MP4", title: "IMG 1477", note: "Video memory" },
+      { type: "video", src: "Photos/IMG_1475.MOV", title: "IMG 1475", note: "Video memory" },
+      { type: "photo", src: "Photos/IMG_1433.JPG.jpeg", title: "IMG 1433", note: "Sweet memory" },
+      { type: "photo", src: "Photos/IMG_1085.PNG", title: "IMG 1085", note: "Forever favourite", shape: "wide" }
+    ];
+
+    const grid = document.getElementById("galleryGrid");
+    const visibleCount = document.getElementById("visibleCount");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxStage = document.getElementById("lightboxStage");
+    const lightboxCaption = document.getElementById("lightboxCaption");
+    const closeLightbox = document.getElementById("closeLightbox");
+    const prevMedia = document.getElementById("prevMedia");
+    const nextMedia = document.getElementById("nextMedia");
+    const filterButtons = Array.from(document.querySelectorAll(".filter-button"));
+    const openedFromBirthday = new URLSearchParams(location.search).get("from") === "birthday";
+
+    let currentFilter = "all";
+    let visibleMedia = media.slice();
+    let activeIndex = 0;
+
+    function count(type) {
+      return media.filter(item => item.type === type).length;
+    }
+
+    document.getElementById("photoCount").textContent = count("photo");
+    document.getElementById("videoCount").textContent = count("video");
+    document.getElementById("totalCount").textContent = media.length;
+
+    function createCard(item, index) {
+      const card = document.createElement("article");
+      card.className = ["gallery-card", item.shape || "", item.type === "video" ? "video-card" : ""].join(" ").trim();
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", `Open ${item.title}`);
+      card.dataset.index = index;
+
+      const element = item.type === "video" ? document.createElement("video") : document.createElement("img");
+      element.src = item.src;
+      element.alt = item.type === "photo" ? item.title : "";
+      if (item.type === "photo") element.loading = "lazy";
+      if (item.type === "video") {
+        element.muted = true;
+        element.playsInline = true;
+        element.preload = "metadata";
+      }
+
+      const info = document.createElement("div");
+      info.className = "card-info";
+      info.innerHTML = `<div><b>${item.title}</b><span>${item.note}</span></div><em class="chip">${item.type}</em>`;
+
+      card.append(element, info);
+      card.addEventListener("click", () => openLightbox(index));
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openLightbox(index);
+        }
+      });
+
+      return card;
+    }
+
+    function renderGallery() {
+      visibleMedia = currentFilter === "all" ? media.slice() : media.filter(item => item.type === currentFilter);
+      grid.replaceChildren(...visibleMedia.map(createCard));
+      const label = currentFilter === "all" ? "files" : `${currentFilter}s`;
+      visibleCount.textContent = `Showing ${visibleMedia.length} ${label}`;
+    }
+
+    function openLightbox(index) {
+      activeIndex = index;
+      paintLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      closeLightbox.focus();
+    }
+
+    function paintLightbox() {
+      const item = visibleMedia[activeIndex];
+      const element = item.type === "video" ? document.createElement("video") : document.createElement("img");
+      element.src = item.src;
+      element.alt = item.type === "photo" ? item.title : "";
+      if (item.type === "video") {
+        element.controls = true;
+        element.autoplay = true;
+        element.playsInline = true;
+      }
+      lightboxStage.replaceChildren(element);
+      lightboxCaption.innerHTML = `<b>${item.title}</b><span>${item.note}</span>`;
+    }
+
+    function closePreview() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxStage.replaceChildren();
+      document.body.style.overflow = "";
+    }
+
+    function movePreview(direction) {
+      activeIndex = (activeIndex + direction + visibleMedia.length) % visibleMedia.length;
+      paintLightbox();
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        currentFilter = button.dataset.filter;
+        filterButtons.forEach(item => item.classList.toggle("active", item === button));
+        renderGallery();
+      });
+    });
+
+    closeLightbox.addEventListener("click", closePreview);
+    prevMedia.addEventListener("click", () => movePreview(-1));
+    nextMedia.addEventListener("click", () => movePreview(1));
+    lightbox.addEventListener("click", event => {
+      if (event.target === lightbox) closePreview();
+    });
+    window.addEventListener("keydown", event => {
+      if (!lightbox.classList.contains("open")) return;
+      if (event.key === "Escape") closePreview();
+      if (event.key === "ArrowLeft") movePreview(-1);
+      if (event.key === "ArrowRight") movePreview(1);
+    });
+
+    renderGallery();
+    if (openedFromBirthday) {
+      document.getElementById("galleryReturn").classList.remove("hidden");
+      document.getElementById("returnToBirthday").addEventListener("click", () => {
+        const preview = new URLSearchParams(location.search).get("test") === "1" ? "&test=1" : "";
+        const returnUrl = `birthday.html?return=memories${preview}#s2`;
+        let openerAvailable = false;
+        try {
+          openerAvailable = Boolean(window.opener && !window.opener.closed);
+          if (openerAvailable) window.opener.focus();
+        } catch (error) {
+          openerAvailable = false;
+        }
+        if (openerAvailable) {
+          window.close();
+          window.setTimeout(() => {
+            if (!window.closed) location.href = returnUrl;
+          }, 180);
+        } else {
+          location.href = returnUrl;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
